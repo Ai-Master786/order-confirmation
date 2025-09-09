@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Delivered</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d1117; /* A deeper dark background */
+            overflow: hidden; /* Hide confetti overflow */
+        }
+        .main-container {
+            position: relative;
+            z-index: 10;
+            background: linear-gradient(135deg, rgba(67, 65, 144, 0.95), rgba(41, 42, 75, 0.95), rgba(138, 35, 135, 0.95));
+            background-size: 400% 400%;
+            animation: fadeIn 1s ease-in-out, auroraShift 12s ease infinite;
+            backdrop-filter: blur(10px);
+            --webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes auroraShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .product-image-container {
+            background-image: linear-gradient(135deg, #868f96 0%, #596164 100%);
+        }
+        .timeline-dot {
+            transition: transform 0.3s ease;
+        }
+        .timeline-item:hover .timeline-dot {
+            transform: scale(1.2);
+        }
+        .status-text {
+            background: linear-gradient(to right, #818cf8, #d8b4fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .interactive-card {
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .interactive-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px rgba(0,0,0,0.3);
+        }
+        .interactive-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -150%;
+            width: 75%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+            transform: skewX(-25deg);
+            transition: left 0.7s ease;
+        }
+        .interactive-card:hover::before {
+            left: 150%;
+        }
+        @keyframes growDown {
+            from { transform: scaleY(0); }
+            to { transform: scaleY(1); }
+        }
+        .animate-grow-down {
+            transform-origin: top;
+            animation: growDown 0.7s 0.8s ease-out forwards;
+        }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 8px #a78bfa, 0 0 16px #a78bfa; }
+            50% { box-shadow: 0 0 16px #c4b5fd, 0 0 24px #c4b5fd; }
+        }
+        .animate-pulse-glow {
+            animation: pulseGlow 2.5s infinite ease-in-out;
+        }
+        @keyframes deliveredPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        .delivered-animation .timeline-dot {
+            animation: deliveredPop 1s 1.5s ease-out;
+        }
+        .action-button {
+            background-image: linear-gradient(to right, #1D976C 0%, #93F9B9  51%, #1D976C  100%);
+            background-size: 200% auto;
+            transition: all 0.4s ease;
+            color: #1a2a2a;
+        }
+        .action-button:hover {
+            background-position: right center;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.25);
+        }
+        .confetti-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100;
+        }
+        .confetti {
+            position: absolute; width: 10px; height: 10px; background-color: #f00; opacity: 0.7;
+        }
+
+        /* --- New "Happy?" Button Special Effect --- */
+        .happy-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .happy-overlay.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .happy-text span {
+            display: inline-block;
+            font-size: 5vw;
+            font-weight: 900;
+            color: white;
+            text-shadow: 0 0 10px #fff, 0 0 20px #ff00ff, 0 0 30px #00ffff;
+            opacity: 0;
+            transform: translateY(100px) scale(0.5) rotate(180deg);
+        }
+        .happy-overlay.visible .happy-text span {
+            animation: flyIn 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+        }
+        @keyframes flyIn {
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1) rotate(0deg);
+            }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4 sm:p-6">
+
+    <div id="confetti-container" class="confetti-container"></div>
+    <div id="happy-overlay" class="happy-overlay">
+        <div class="happy-text">
+            <span>Y</span><span>A</span><span>Y</span><span>!</span>
+        </div>
+    </div>
+
+    <div class="main-container w-full max-w-4xl mx-auto rounded-3xl shadow-2xl text-white overflow-hidden p-8 md:p-12">
+        
+        <header class="flex justify-between items-center mb-8 animate-fadeIn" style="animation-delay: 0.2s;">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold tracking-tight">Your Order Has Been Delivered!</h1>
+                <p class="text-gray-300 text-sm mt-1">Thank you for shopping with us.</p>
+            </div>
+            <img src="./logo.png" alt="Company Logo" class="w-16 h-16 rounded-full border-2 border-white/50 object-cover shadow-lg">
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="animate-fadeIn" style="animation-delay: 0.4s;">
+                <div class="flex items-start space-x-6 bg-white/10 p-6 rounded-2xl backdrop-blur-sm interactive-card">
+                    <div class="product-image-container w-24 h-24 rounded-xl flex-shrink-0 flex items-center justify-center shadow-lg">
+                       <img src="./product.jpg" alt="Digital Hanging Scale" class="w-20 h-20 object-contain rounded-md transition-transform duration-300 hover:scale-110">
+                    </div>
+                    <div>
+                        <h2 class="font-bold text-lg">Digital Hanging Scale</h2>
+                        <p class="text-sm text-gray-300 mt-1">1 x 50kg Capacity Model</p>
+                    </div>
+                </div>
+
+                <div class="mt-8 bg-white/10 p-6 rounded-2xl backdrop-blur-sm interactive-card">
+                    <h3 class="font-bold text-lg mb-4">Delivery Details</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <p class="text-sm text-gray-300">Delivered On</p>
+                            <p class="font-semibold text-lg">9th September 2025, 2:15 PM</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-300">Delivery Address</p>
+                            <p class="font-semibold">Raeesa Phuppu, Dipl. 503, Kanungo.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="animate-fadeIn" style="animation-delay: 0.6s;">
+                <div class="bg-white/10 p-6 rounded-2xl backdrop-blur-sm h-full interactive-card">
+                     <h3 class="font-bold text-lg mb-6">Order Timeline</h3>
+                     <div class="relative pl-6">
+                        <div class="absolute left-2 top-0 bottom-0 w-0.5 bg-white/20 animate-grow-down"></div>
+                        <div class="relative mb-8 timeline-item" style="animation: fadeIn 1s 1s ease-out forwards; opacity: 0;">
+                            <div class="absolute -left-[30px] top-1 w-5 h-5 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-full timeline-dot animate-pulse-glow"></div>
+                            <p class="font-semibold status-text">Order Confirmed</p>
+                            <p class="text-sm text-gray-300">We received your order.</p>
+                            <p class="text-xs text-gray-400 mt-1">6th Sep 2025</p>
+                        </div>
+                        <div class="relative mb-8 timeline-item" style="animation: fadeIn 1s 1.2s ease-out forwards; opacity: 0;">
+                            <div class="absolute -left-[30px] top-1 w-5 h-5 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-full timeline-dot animate-pulse-glow" style="animation-delay: 0.2s"></div>
+                            <p class="font-semibold status-text">Shipped</p>
+                            <p class="text-sm text-gray-300">Your item was on its way.</p>
+                            <p class="text-xs text-gray-400 mt-1">6th Sep 2025</p>
+                        </div>
+                        <div class="relative timeline-item delivered-animation" style="animation: fadeIn 1s 1.4s ease-out forwards; opacity: 0;">
+                           <div class="absolute -left-[30px] top-1 w-5 h-5 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-full timeline-dot animate-pulse-glow" style="animation-delay: 0.4s"></div>
+                            <p class="font-semibold status-text">Delivered</p>
+                            <p class="text-sm text-gray-300">Your package has arrived.</p>
+                            <p class="text-xs text-gray-400 mt-1">9th Sep 2025</p>
+                        </div>
+                     </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer class="text-center mt-10 animate-fadeIn" style="animation-delay: 1.6s;">
+            <button id="happyButton" class="action-button text-white font-bold py-3 px-8 rounded-full shadow-lg focus:outline-none">
+                Happy?
+            </button>
+        </footer>
+    </div>
+    <script>
+        function launchConfetti() {
+            const container = document.getElementById('confetti-container');
+            const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800'];
+            const confettiCount = 100;
+
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                const anim = document.createElement('style');
+                const key = `fall_horizontal_${i}`;
+                anim.innerHTML = `@keyframes ${key} { to { transform: translate(${Math.random() * 200 - 100}px, 110vh) rotate(${Math.random() * 720}deg); opacity: 0; } }`;
+                document.head.appendChild(anim);
+                
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.top = Math.random() * -100 + 'vh';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.width = Math.random() * 8 + 5 + 'px';
+                confetti.style.height = confetti.style.width;
+                confetti.style.animationName = key;
+                confetti.style.animationDelay = Math.random() * 1 + 's';
+                confetti.style.animationDuration = Math.random() * 3 + 3 + 's';
+                confetti.style.animationTimingFunction = 'linear';
+                confetti.style.animationFillMode = 'forwards';
+                container.appendChild(confetti);
+            }
+        }
+        
+        setTimeout(launchConfetti, 1000);
+
+        // --- "Happy?" Button Logic ---
+        const happyButton = document.getElementById('happyButton');
+        const happyOverlay = document.getElementById('happy-overlay');
+        const happyTextSpans = document.querySelectorAll('.happy-text span');
+
+        happyButton.addEventListener('click', () => {
+            happyOverlay.classList.add('visible');
+            
+            // Stagger the letter animations
+            happyTextSpans.forEach((span, index) => {
+                span.style.animationDelay = `${index * 0.1}s`;
+            });
+            
+            // Hide the message after a few seconds
+            setTimeout(() => {
+                happyOverlay.classList.remove('visible');
+            }, 3000);
+        });
+
+    </script>
+</body>
+</html>
+
